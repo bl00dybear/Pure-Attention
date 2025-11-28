@@ -1,5 +1,6 @@
 // headers
 #include <core/Tensor.h>
+#include <core/Context.h>
 
 // libs
 #include <cuda_runtime.h>
@@ -50,7 +51,7 @@ namespace core {
             throw std::length_error("Size mismatch: CPU array has different size to GPU tensor.");
         }
 
-        cudaError_t err = cudaMemcpy(data_ptr.get(), host_data.data(), size * sizeof(float32_t), cudaMemcpyHostToDevice);
+        cudaError_t err = cudaMemcpyAsync(data_ptr.get(), host_data.data(), size * sizeof(float32_t), cudaMemcpyHostToDevice, CudaContext::getStream());
         
         if (err != cudaSuccess) {
             throw std::runtime_error("To GPU error (Memcpy H2D)");
@@ -60,7 +61,7 @@ namespace core {
     std::vector<float32_t> Tensor::to_host() {
         std::vector<float32_t> host_result(size);
 
-        cudaError_t err = cudaMemcpy(host_result.data(), data_ptr.get(), size * sizeof(float32_t), cudaMemcpyDeviceToHost);
+        cudaError_t err = cudaMemcpyAsync(host_result.data(), data_ptr.get(), size * sizeof(float32_t), cudaMemcpyDeviceToHost, CudaContext::getStream());
 
         if (err != cudaSuccess) {
             throw std::runtime_error("To CPU error (Memcpy D2H)");

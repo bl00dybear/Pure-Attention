@@ -1,5 +1,8 @@
 #pragma once
 
+// libs
+#include <cuda_runtime.h>
+
 #define TILE_WIDTH 32
 
 void launch_matmul_tiled(float *A, float *B, float *C, int M, int N, int K, cudaStream_t stream = 0);
