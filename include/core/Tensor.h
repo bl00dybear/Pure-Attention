@@ -39,5 +39,9 @@ namespace core {
         // Cuda methods
         void to_device(const std::vector<float32_t>& host_data);
         std::vector<float32_t> to_host();
+
+        // getters and setters
+        std::vector<int32_t> get_shape() const {};
+        float *get_data_ptr() const {};
     };
 };

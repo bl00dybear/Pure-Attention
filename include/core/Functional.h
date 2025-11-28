@@ -1,0 +1,1 @@
+// friend functional classes declaration

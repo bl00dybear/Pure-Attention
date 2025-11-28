@@ -29,19 +29,20 @@ namespace core {
 
         data_ptr.reset(raw_ptr_data);
 
-
         // gradient
-        float32_t* raw_ptr_grad = nullptr;
-        size_t bytes = size * sizeof(float32_t);
-
-        cudaError_t err = cudaMalloc((void**)&raw_ptr_grad, bytes);
-
-        if (err != cudaSuccess) {
-            std::string error_msg = "CUDA Error: " + std::string(cudaGetErrorString(err));
-            throw std::runtime_error(error_msg);
+        if (has_gradient) {
+            float32_t* raw_ptr_grad = nullptr;
+            size_t bytes = size * sizeof(float32_t);
+    
+            cudaError_t err = cudaMalloc((void**)&raw_ptr_grad, bytes);
+    
+            if (err != cudaSuccess) {
+                std::string error_msg = "CUDA Error: " + std::string(cudaGetErrorString(err));
+                throw std::runtime_error(error_msg);
+            }
+    
+            gradient_ptr.reset(raw_ptr_grad);
         }
-
-        gradient_ptr.reset(raw_ptr_grad);
     }
 
     void Tensor::to_device(const std::vector<float32_t>& host_data) {
@@ -67,4 +68,12 @@ namespace core {
         
         return host_result;
     }
+
+    std::vector<int32_t> Tensor::get_shape() const {
+        return shape;
+    };
+
+    float *Tensor::get_data_ptr() const {
+        return data_ptr.get();
+    };
 };
