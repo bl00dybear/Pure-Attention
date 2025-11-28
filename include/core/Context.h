@@ -4,7 +4,7 @@
 #include <cuda_runtime.h>
 
 struct CudaContext {
-    static cudaStream_t current_stream;
+    inline static cudaStream_t current_stream = 0;
     
     static cudaStream_t getStream() {
         return current_stream;

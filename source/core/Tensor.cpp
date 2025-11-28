@@ -78,12 +78,13 @@ namespace core {
 };
 
 
-// nvcc -std=c++20 -Iinclude -o forward \
-//   main.cpp \
-//   source/layers/Linear.cpp \
-//   source/layers/ReLU.cpp \
-//   source/core/Functional.cpp \
-//   source/core/Tensor.cpp \
-//   source/backend/Launchers.cu \
-//   source/backend/Kernels.cu \
+// Build command example (no trailing backslashes):
+// nvcc -std=c++20 -Iinclude -o forward 
+//   main.cpp 
+//   source/layers/Linear.cpp 
+//   source/layers/ReLU.cpp 
+//   source/core/Functional.cpp 
+//   source/core/Tensor.cpp 
+//   source/backend/Launchers.cu 
+//   source/backend/Kernels.cu 
 //   -lcurand -lcudart

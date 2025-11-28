@@ -1,8 +1,7 @@
 // headers
 #include <core/Tensor.h>
-// #include <backend/Launchers.cpp>
+#include <backend/Launchers.h>
 #include <core/Context.h>
-#include "../backend/Launchers.cu"
 
 // libs
 #include <memory>

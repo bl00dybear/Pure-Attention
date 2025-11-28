@@ -5,11 +5,14 @@
 #include "include/layers/ReLU.h"
 #include "include/core/Tensor.h"
 #include "include/core/Functional.h"
+#include "include/core/Context.h"
+#include <cuda_runtime.h>
 
 int main() {
     using namespace layers;
     using namespace core;
-
+    
+    // cudaStream_t CudaContext::current_stream = 0; // Cannot define static member inside function
     const uint32_t B = 2;  // redus pentru debugging
     const uint32_t IN = 4;
     const uint32_t H = 3;
