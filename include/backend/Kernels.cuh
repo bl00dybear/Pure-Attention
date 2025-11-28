@@ -5,5 +5,5 @@
 
 __global__ void matmul_kernel_tiled(const float *A, const float *B, float *C, int M, int N, int K);
 __global__ void matadd_kernel_tiled(const float *A, const float *X, float *B, const int M, const int N);
-
 __global__ void populate_normal(float *A, int M, int N, unsigned long long seed);
+__global__ void ReLU_kernel_tiled(const float *In, const float *Out, int N);

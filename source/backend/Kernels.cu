@@ -71,3 +71,10 @@ __global__ void populate_normal(float *A, int M, int N, unsigned long long seed)
     }
 }
 
+__global__ void ReLU_kernel_tiled(const float *In, float *Out, int N) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (idx < N) {
+        Out[idx] = fmaxf(0.0f, In[idx]);
+    }
+}

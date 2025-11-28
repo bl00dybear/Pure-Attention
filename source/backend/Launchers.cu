@@ -47,3 +47,10 @@ void launch_normal_population(float *A, int M, int N, cudaStream_t stream = 0){
     );
     populate_normal<<<blocks, threads, 0, stream>>>(A, M, N, seed);
 }
+
+void launch_ReLU_tiled(float *In, float *Out, int N, cudaStream_t stream = 0) {
+    dim3 block(TILE_WIDTH, TILE_WIDTH);
+    dim3 grid((N + block.x - 1) / block.x);
+
+    ReLU_kernel_tiled<<<grid, block, 0, stream>>>(In, Out, N);
+}

@@ -42,6 +42,21 @@ namespace core {
         return B;
     }
 
+    std::shared_ptr<Tensor> ReLU(const std::shared_ptr<Tensor>& In) {
+        int N = In->get_shape()[0];
+
+        auto Out = std::make_shared<Tensor>(std::vector<int>{N});
+
+        launch_ReLU_tiled(
+            In->get_data_ptr(), 
+            Out->get_data_ptr(),
+            N,
+            CudaContext::getStream()
+        );
+
+        return Out;
+    }
+
     void popzeros(const std::shared_ptr<Tensor>& A){
         int M = A->get_shape()[0];
         int N = A->get_shape()[1];
