@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Module.h"
-#include "Functional.h"
+#include "../core/Functional.h"
+#include "../core/Tensor.h"
+
 
 namespace core {
     class Tensor;

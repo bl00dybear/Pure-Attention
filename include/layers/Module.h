@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include "../core/Tensor.h"
 
 namespace layers{
     using float32_t = float;

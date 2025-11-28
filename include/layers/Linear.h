@@ -3,12 +3,14 @@
 #include "Module.h"
 #include <memory>
 #include <vector>
+#include "../core/Tensor.h"
+
 
 
 namespace layers {
 
     class Linear : public Module{
-    private:
+    public:
         std::shared_ptr<core::Tensor> weight;
         std::shared_ptr<core::Tensor> bias;
 

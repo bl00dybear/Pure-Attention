@@ -1,4 +1,4 @@
-#include <backend/Launchers.h>
+// #include <backend/Launchers.h>
 #include <backend/Kernels.cuh>
 
 void launch_matmul_tiled(float *A, float *B, float *C, int M, int N, int K, cudaStream_t stream = 0) {
@@ -45,6 +45,8 @@ void launch_normal_population(float *A, int M, int N, cudaStream_t stream = 0){
     unsigned long long seed = static_cast<unsigned long long>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()
     );
+
+    seed=42;
     populate_normal<<<blocks, threads, 0, stream>>>(A, M, N, seed);
 }
 

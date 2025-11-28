@@ -34,7 +34,7 @@ namespace core {
         void to_device(const std::vector<float32_t>& host_data);
         std::vector<float32_t> to_host();
 
-        std::vector<uint32_t> get_shape() const {};
-        float *get_data_ptr() const {};
+        std::vector<uint32_t> get_shape() const ;
+        float *get_data_ptr() const ;
     };
 };
