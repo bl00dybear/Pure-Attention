@@ -57,3 +57,17 @@ __global__ void matadd_kernel_tiled(const float *A, const float *X, float *B, co
         B[index] = A[index] + X[global_col];
     }
 }
+
+__global__ void populate_normal(float *A, int M, int N, unsigned long long seed) {
+    const int tid0 = blockIdx.x * blockDim.x + threadIdx.x;
+    const int stride = gridDim.x * blockDim.x;
+    const int total = M * N;
+
+    curandStatePhilox4_32_10_t state;
+    curand_init(seed, tid0, 0, &state);
+
+    for (int i = tid0; i < total; i += stride) {
+        A[i] = curand_normal(&state);
+    }
+}
+

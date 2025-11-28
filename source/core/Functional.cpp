@@ -41,4 +41,18 @@ namespace core {
 
         return B;
     }
+
+    void popzeros(const std::shared_ptr<Tensor>& A){
+        int M = A->get_shape()[0];
+        int N = A->get_shape()[1];
+
+        launch_zero_population(A->get_data_ptr(), M, N, CudaContext::getStream());
+    }
+
+    void popnormal(const std::shared_ptr<Tensor>& A){
+        int M = A->get_shape()[0];
+        int N = A->get_shape()[1];
+
+        launch_zero_population(A->get_data_ptr(), M, N, CudaContext::getStream());
+    }
 };

@@ -14,7 +14,8 @@ namespace layers{
         weight = std::make_shared<Tensor>(std::vector<uint32_t>{in_channels,out_channels});
         bias = std::make_shared<Tensor>(std::vector<uint32_t>{1,out_channels});
 
-        // populare vram cu w N(0,1) si b cu 0
+        popnormal(weight);
+        popzeros(bias);
 
     }
 
