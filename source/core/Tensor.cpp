@@ -8,7 +8,7 @@
 #include <string>
 
 namespace core {
-    Tensor::Tensor(const std::vector<int>& shape, bool has_gradient) : 
+    Tensor::Tensor(const std::vector<uint32_t>& shape, bool has_gradient) : 
     shape(shape), 
     has_gradient(has_gradient) 
     {
@@ -17,7 +17,6 @@ namespace core {
             size *= s;
         }
 
-        // data
         float32_t* raw_ptr_data = nullptr;
         size_t bytes = size * sizeof(float32_t);
 
@@ -30,7 +29,6 @@ namespace core {
 
         data_ptr.reset(raw_ptr_data);
 
-        // gradient
         if (has_gradient) {
             float32_t* raw_ptr_grad = nullptr;
             size_t bytes = size * sizeof(float32_t);
@@ -70,7 +68,7 @@ namespace core {
         return host_result;
     }
 
-    std::vector<int32_t> Tensor::get_shape() const {
+    std::vector<uint32_t> Tensor::get_shape() const {
         return shape;
     };
 
