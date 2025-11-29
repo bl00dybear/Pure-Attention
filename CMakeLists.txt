@@ -14,10 +14,10 @@ set(CMAKE_CUDA_ARCHITECTURES native)
 include_directories(include)
 
 # Colectăm sursele
-file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.cu")
+file(GLOB_RECURSE SOURCES "source/*.cpp" "source/*.cu")
 
 # Executabilul
-add_executable(neural_net ${SOURCES})
+add_executable(neural_net ${SOURCES} ${CMAKE_SOURCE_DIR}/main.cpp)
 
 # Linkare cu biblioteci CUDA (runtime și math library dacă e cazul)
 target_link_libraries(neural_net PRIVATE CUDA::cudart)

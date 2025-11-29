@@ -1,3 +1,4 @@
+// headers
 #include <backend/Kernels.cuh>
 
 __global__ void matmul_kernel_tiled(const float *A, const float *B, float *C, int M, int N, int K) {
@@ -71,10 +72,12 @@ __global__ void populate_normal(float *A, int M, int N, unsigned long long seed)
     }
 }
 
-__global__ void ReLU_kernel_tiled(const float *In, float *Out, int N) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void ReLU_kernel_tiled(const float *In, float *Out, int M, int N) {
+    int global_col = blockIdx.x * blockDim.x + threadIdx.x;
+    int global_row = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (idx < N) {
-        Out[idx] = fmaxf(0.0f, In[idx]);
+    if (global_row < M && global_col < N) {
+        int index = global_row * N + global_col;
+        Out[index] = fmaxf(0.0f, In[index]);
     }
 }

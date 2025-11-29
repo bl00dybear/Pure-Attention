@@ -1,3 +1,4 @@
+// headers
 #include <backend/Launchers.h>
 #include <backend/Kernels.cuh>
 
@@ -50,9 +51,9 @@ void launch_normal_population(float *A, int M, int N, cudaStream_t stream){
     populate_normal<<<blocks, threads, 0, stream>>>(A, M, N, seed);
 }
 
-void launch_ReLU_tiled(float *In, float *Out, int N, cudaStream_t stream) {
+void launch_ReLU_tiled(float *In, float *Out, int M, int N, cudaStream_t stream) {
     dim3 block(TILE_WIDTH, TILE_WIDTH);
-    dim3 grid((N + block.x - 1) / block.x);
+    dim3 grid((N + block.x - 1) / block.x, (M + block.y - 1) / block.y);
 
-    ReLU_kernel_tiled<<<grid, block, 0, stream>>>(In, Out, N);
+    ReLU_kernel_tiled<<<grid, block, 0, stream>>>(In, Out, M, N);
 }

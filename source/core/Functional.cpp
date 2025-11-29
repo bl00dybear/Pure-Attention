@@ -43,14 +43,15 @@ namespace core {
     }
 
     std::shared_ptr<Tensor> relu(const std::shared_ptr<Tensor>& In) {
-        uint32_t N = In->get_shape()[0];
+        uint32_t M = In->get_shape()[0];
+        uint32_t N = In->get_shape()[1];
 
-        auto Out = std::make_shared<Tensor>(std::vector<uint32_t>{N});
+        auto Out = std::make_shared<Tensor>(std::vector<uint32_t>{M, N});
 
         launch_ReLU_tiled(
             In->get_data_ptr(), 
             Out->get_data_ptr(),
-            N,
+            M, N,
             CudaContext::getStream()
         );
 

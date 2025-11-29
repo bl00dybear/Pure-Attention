@@ -1,11 +1,11 @@
 #include <memory>
 #include <iostream>
 #include <vector>
-#include "include/layers/Linear.h"
-#include "include/layers/ReLU.h"
-#include "include/core/Tensor.h"
-#include "include/core/Functional.h"
-#include "include/core/Context.h"
+#include <layers/Linear.h>
+#include <layers/ReLU.h>
+#include <core/Tensor.h>
+#include <core/Functional.h>
+#include <core/Context.h>
 #include <cuda_runtime.h>
 
 int main() {
@@ -13,17 +13,19 @@ int main() {
     using namespace core;
     
     // cudaStream_t CudaContext::current_stream = 0; // Cannot define static member inside function
-    const uint32_t B = 2;  // redus pentru debugging
-    const uint32_t IN = 4;
-    const uint32_t H = 3;
-    const uint32_t OUT = 2;
+    const uint32_t B = 3;  // redus pentru debugging
+    const uint32_t IN = 5;
+    const uint32_t H = 6;
+    const uint32_t OUT = 3;
 
     // Hardcoded input values
     std::vector<float> input_data = {
         // Batch 0
-        0.5f, -0.3f, 1.2f, -0.8f,
+        0.5f, -0.3f, 1.2f, -0.8f, 0.72f,
         // Batch 1
-        0.1f, 0.9f, -0.5f, 0.7f
+        0.1f, 0.9f, -0.5f, 0.7f, 0.2f,
+        // Batch 2
+        0.32f, 0.13f, -0.9f, -0.01f, 0.3f
     };
 
     // Create input tensor and fill with hardcoded values

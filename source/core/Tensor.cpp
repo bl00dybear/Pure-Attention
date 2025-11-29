@@ -76,15 +76,3 @@ namespace core {
         return data_ptr.get();
     };
 };
-
-
-// Build command example (no trailing backslashes):
-// nvcc -std=c++20 -Iinclude -o forward 
-//   main.cpp 
-//   source/layers/Linear.cpp 
-//   source/layers/ReLU.cpp 
-//   source/core/Functional.cpp 
-//   source/core/Tensor.cpp 
-//   source/backend/Launchers.cu 
-//   source/backend/Kernels.cu 
-//   -lcurand -lcudart
