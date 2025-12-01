@@ -29,32 +29,32 @@ namespace core {
     }
 
 
-    AddFunction::AddFunction(std::shared_ptr<Tensor> a, std::shared_ptr<Tensor> b, std::shared_ptr<Tensor> &c)
-            : Input_A(a), Input_B(b), Output_C(c) {}
+    AddFunction::AddFunction(std::shared_ptr<Tensor> x, std::shared_ptr<Tensor> bias, std::shared_ptr<Tensor> y)
+            : X_input(x), bias_input(bias), Y_output(y) {}
 
     void AddFunction::apply_backward() {
-        auto out_ptr = Output_C.lock();
+        auto out_ptr = Y_output.lock();
         if (!out_ptr) return;
 
-        auto grad_out_ptr = out_ptr->get_gradient_ptr();
+        const auto grad_out_ptr = out_ptr->get_gradient_ptr();
         uint32_t M = out_ptr->get_shape()[0];
         uint32_t N = out_ptr->get_shape()[1];
         uint32_t size = M * N;
 
-        if (Input_A->requires_grad()) {
-            launch_tensor_add_grad(grad_out_ptr,Input_A->get_gradient_ptr(),size, CudaContext::getStream());
-            Input_A->backward();
+        if (X_input->requires_grad()) {
+            launch_tensor_add_grad(grad_out_ptr,X_input->get_gradient_ptr(),size, CudaContext::getStream());
+            X_input->backward();
         }
 
-        if (Input_B->requires_grad()) {
-            bool is_bias = (Input_B->get_shape()[0] == 1 && M > 1);
+        if (bias_input->requires_grad()) {
+            bool is_bias = (bias_input->get_shape()[0] == 1 && M > 1);
 
             if (is_bias)
-                launch_sum_rows_grad(grad_out_ptr,Input_B->get_gradient_ptr(), M, N, CudaContext::getStream());
+                launch_sum_rows_grad(grad_out_ptr,bias_input->get_gradient_ptr(), M, N, CudaContext::getStream());
             else
-                launch_tensor_add_grad(grad_out_ptr,Input_B->get_gradient_ptr(),size,CudaContext::getStream());
+                launch_tensor_add_grad(grad_out_ptr,bias_input->get_gradient_ptr(),size,CudaContext::getStream());
 
-            Input_B->backward();
+            bias_input->backward();
         }
     }
 

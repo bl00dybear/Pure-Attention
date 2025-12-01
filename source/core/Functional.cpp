@@ -121,4 +121,22 @@ namespace core {
 
         launch_normal_population(A->get_data_ptr(), M, N, CudaContext::getStream());
     }
+
+
+    std::shared_ptr<Tensor> mse_loss(const std::shared_ptr<Tensor>& preds, const std::shared_ptr<Tensor>& targets) {
+        // 1. Calculam Loss-ul (Forward) - Kernel de reducere (Sum((p-t)^2) / N)
+        // Rezultatul e un Tensor scalar (shape {1})
+        bool needs_grad = preds->requires_grad();
+        auto loss = std::make_shared<Tensor>(std::vector<uint32_t>{1}, needs_grad, false);
+
+        // ... aici apelezi launch_mse_forward ...
+
+        // 2. Conectam Graful
+        if (needs_grad) {
+            auto node = std::make_shared<MSEFunction>(preds, targets, loss);
+            loss->set_grad_fn(node);
+        }
+
+        return loss;
+    }
 };

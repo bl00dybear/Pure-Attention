@@ -2,6 +2,7 @@
 
 // libs
 #include <curand_kernel.h>
+#include <c++/13/cstdint>
 
 // macro
 #define TILE_WIDTH 32
@@ -10,20 +11,24 @@ using float32_t = float;
 
 __global__ void matmul_kernel_tiled(const float32_t *A, const float32_t *B, float32_t *C, int32_t M, int32_t N, int32_t K);
 __global__ void matadd_kernel_tiled(const float32_t *A, const float32_t *X, float32_t *B, const int32_t M, const int32_t N);
-__global__ void ReLU_kernel_tiled(const float32_t *In, float32_t *Out, int32_t M, int32_t N);
-__global__ void populate_normal(float32_t *A, int32_t M, int32_t N, unsigned long long seed);
-
+__global__ void ReLU_kernel_tiled(const float *In, float *Out, const u_int32_t M, const uint32_t N);
+__global__ void populate_normal(float32_t *A, uint32_t M, uint32_t N, const uint64_t seed);
 __global__ void matmul_backward_X_kernel(
     const float32_t* __restrict__ grad_Y_out,
     const float32_t* __restrict__ W_in,
     float32_t* __restrict__ grad_X_in,
-    int32_t M, int32_t N, int32_t K);
-
-__global__ void matmul_backward_B_kernel(
-    const float32_t* __restrict__ A,
-    const float32_t* __restrict__ grad_C,
-    float32_t* __restrict__ grad_B,
-    int32_t M, int32_t N, int32_t K);
+    const uint32_t M, const uint32_t N, const uint32_t K);
+__global__ void matmul_backward_W_kernel(
+    const float32_t *X_in,
+    const float32_t *grad_Y_out,
+    float32_t *grad_W_in,
+    const u_int32_t M, const u_int32_t N, const uint32_t K);
 __global__ void tensor_add_grad_kernel(const float32_t* src, float32_t* dst, int32_t size) ;
 __global__ void sum_rows_grad_kernel(const float32_t* src, float32_t* dst, int32_t M, int32_t N) ;
 __global__ void relu_backward_kernel(const float32_t* grad_out, const float32_t* input_data, float32_t* grad_in, int32_t size) ;
+__global__ void mse_backward_kernel(
+    const float* predictions,
+    const float* targets,
+    const float* grad_loss_scalar,
+    float* grad_predictions,
+    int N) ;

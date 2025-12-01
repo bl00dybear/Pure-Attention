@@ -2,6 +2,8 @@
 #include <backend/Launchers.h>
 #include <backend/Kernels.cuh>
 #include <algorithm>
+
+#include <curand_kernel.h>
  
 using float32_t = float;
 
@@ -80,13 +82,13 @@ void launch_matmul_grad_X(const float32_t* grad_Y_out, const float32_t* W_in, fl
     matmul_backward_X_kernel<<<grid, block, 0, stream>>>(grad_Y_out, W_in, grad_X_in, M, N, K);
 }
 
-void launch_matmul_grad_W(const float32_t* A, const float32_t* grad_C, float32_t* grad_B,
-                          int M, int N, int K, cudaStream_t stream) {
+void launch_matmul_grad_W(const float32_t *X_in, const float32_t *grad_Y_out, float32_t *grad_W_in,
+                          const int M, const int N, const int K, cudaStream_t stream) {
 
     dim3 block(TILE_WIDTH, TILE_WIDTH);
     dim3 grid((K + TILE_WIDTH - 1) / TILE_WIDTH, (N + TILE_WIDTH - 1) / TILE_WIDTH);
 
-    matmul_backward_B_kernel<<<grid, block, 0, stream>>>(A, grad_C, grad_B, M, N, K);
+    matmul_backward_W_kernel<<<grid, block, 0, stream>>>(X_in, grad_Y_out, grad_W_in, M, N, K);
 }
 
 void launch_tensor_add_grad(const float32_t* src, float32_t* dst, int size, cudaStream_t stream) {
@@ -106,4 +108,21 @@ void launch_relu_backward(const float32_t* grad_out, const float32_t* input_data
     int threads = 256;
     int blocks = (size + threads - 1) / threads;
     relu_backward_kernel<<<blocks, threads, 0, stream>>>(grad_out, input_data, grad_in, size);
+}
+
+
+void launch_mse_backward(
+    const float* preds,
+    const float* targets,
+    const float* grad_loss,
+    float* grad_preds,
+    int N,
+    cudaStream_t stream)
+{
+    int threads = 256;
+    int blocks = (N + threads - 1) / threads;
+
+    mse_backward_kernel<<<blocks, threads, 0, stream>>>(
+        preds, targets, grad_loss, grad_preds, N
+    );
 }
