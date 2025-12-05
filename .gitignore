@@ -8,3 +8,4 @@ main.cpp
 main_target.cpp
 extern/
 .env/
+PureAttention.cpython-312-x86_64-linux-gnu.so
