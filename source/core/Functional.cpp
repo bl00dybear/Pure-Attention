@@ -14,6 +14,8 @@ namespace core {
         const uint32_t K = B->get_shape()[1];
 
         bool needs_grad = A->requires_grad() || B->requires_grad();
+        // printf("Matmul needs grad: %d\n", needs_grad);
+
 
         auto C = std::make_shared<Tensor>(std::vector<uint32_t>{M, K}, needs_grad, false);
 
@@ -39,6 +41,9 @@ namespace core {
 
         bool needs_grad = A->requires_grad() || X->requires_grad();
 
+        // printf("Matadd needs grad: %d\n", needs_grad);
+
+
         auto B = std::make_shared<Tensor>(std::vector<uint32_t>{M, N}, needs_grad, false);
 
         launch_matadd_tiled(
@@ -62,6 +67,7 @@ namespace core {
         uint32_t N = In->get_shape()[1];
 
         bool needs_grad = In->requires_grad();
+        // printf("ReLU needs grad: %d\n", needs_grad);
 
         auto Out = std::make_shared<Tensor>(std::vector<uint32_t>{M, N},needs_grad,false);
 
@@ -84,12 +90,20 @@ namespace core {
         int M = A->get_shape()[0];
         int N = A->get_shape()[1];
 
+        if (N == 0)
+            N = 1;
+
+
         launch_zero_population(A->get_data_ptr(), M, N, CudaContext::getStream());
     }
 
     void pop_grad_zeros(const std::shared_ptr<Tensor>& A){
         int M = A->get_shape()[0];
         int N = A->get_shape()[1];
+
+        if (N == 0)
+            N = 1;
+
 
         launch_zero_population(A->get_gradient_ptr(), M, N, CudaContext::getStream());
     }
@@ -98,12 +112,20 @@ namespace core {
         int M = A->get_shape()[0];
         int N = A->get_shape()[1];
 
+        if (N == 0)
+            N = 1;
+
+
         launch_zero_population(A->get_gradient_ptr(), M, N, CudaContext::getStream());
     }
 
     void pop_grad_ones(const std::shared_ptr<Tensor>& A){
         int M = A->get_shape()[0];
         int N = A->get_shape()[1];
+
+        if (N == 0)
+            N = 1;
+
 
         launch_ones_population(A->get_gradient_ptr(), M, N, CudaContext::getStream());
     }
@@ -112,12 +134,19 @@ namespace core {
         int M = A->get_shape()[0];
         int N = A->get_shape()[1];
 
+        if (N == 0)
+            N = 1;
+
         launch_ones_population(A->get_gradient_ptr(), M, N, CudaContext::getStream());
     }
 
     void pop_data_normal(const std::shared_ptr<Tensor>& A){
         int M = A->get_shape()[0];
         int N = A->get_shape()[1];
+
+        if (N == 0)
+            N = 1;
+
 
         launch_normal_population(A->get_data_ptr(), M, N, CudaContext::getStream());
     }

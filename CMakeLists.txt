@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.18)
 project(DeepLearningEngine LANGUAGES CXX CUDA)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -24,6 +28,10 @@ target_include_directories(PureAttention PRIVATE include)
 
 target_link_libraries(PureAttention PRIVATE CUDA::cudart)
 
+target_compile_options(PureAttention PRIVATE
+        $<$<AND:$<COMPILE_LANGUAGE:CUDA>,$<CONFIG:Debug>>:-G -g>
+        $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:Debug>>:-g -O0>
+)
 
 set_target_properties(PureAttention PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"

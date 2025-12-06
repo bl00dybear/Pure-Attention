@@ -68,6 +68,16 @@ namespace core {
         return host_result;
     }
 
+    std::vector<float32_t> Tensor::grad_to_host() const {
+        std::vector<float32_t> host_result(size);
+
+        if (const cudaError_t err = cudaMemcpyAsync(host_result.data(), gradient_ptr.get(), size * sizeof(float32_t), cudaMemcpyDeviceToHost, CudaContext::getStream()); err != cudaSuccess) {
+            throw std::runtime_error("To CPU error (Memcpy D2H)");
+        }
+
+        return host_result;
+    }
+
     std::vector<uint32_t> Tensor::get_shape() const {
         return shape;
     };
@@ -92,7 +102,18 @@ namespace core {
             throw std::runtime_error("Called backward() on a tensor that does not require gradients.");
         }
 
-        pop_grad_ones(this);
+        size_t total_elements = 1;
+        for (auto s : shape) total_elements *= s;
+
+        std::vector<float> host_ones(total_elements, 1.0f);
+
+        cudaMemcpyAsync(
+            gradient_ptr.get(),
+            host_ones.data(),
+            total_elements * sizeof(float),
+            cudaMemcpyHostToDevice,
+            CudaContext::getStream()
+        );
 
         if (grad_function)
             grad_function->apply_backward();

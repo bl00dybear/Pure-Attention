@@ -44,7 +44,7 @@ PYBIND11_MODULE(PureAttention, m) {
         .def("backward", &Tensor::backward)
         .def("to_host", &Tensor::to_host)
         .def("to_device", &Tensor::to_device)
-        // .def("grad_to_host", &Tensor::grad_to_host)
+        .def("grad_to_host", &Tensor::grad_to_host)
         .def("shape", &Tensor::get_shape);
 
     py::class_<Module, PyModule, std::shared_ptr<Module>>(m, "Module")
@@ -55,7 +55,9 @@ PYBIND11_MODULE(PureAttention, m) {
     py::class_<Linear, Module, std::shared_ptr<Linear>>(m, "Linear")
         .def(py::init<uint32_t, uint32_t>())
         .def("forward", &Linear::forward)
-        .def("parameters", &Linear::parameters);
+        .def("parameters", &Linear::parameters)
+        .def_readwrite("weight", &Linear::weight)
+        .def_readwrite("bias", &Linear::bias);
 
     py::class_<ReLU, Module, std::shared_ptr<ReLU>>(m, "ReLU")
         .def(py::init<>())
