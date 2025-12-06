@@ -46,7 +46,7 @@ namespace core {
         float32_t *get_gradient_ptr() const;
         void set_grad_fn(std::shared_ptr<Function> fn);
 
-        void backward();
+        void backward() const;
 
         friend struct Function;
     };

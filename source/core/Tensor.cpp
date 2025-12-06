@@ -97,7 +97,7 @@ namespace core {
         is_leaf=false;
     }
 
-    void Tensor::backward() {
+    void Tensor::backward() const {
         if (!requires_gradient) {
             throw std::runtime_error("Called backward() on a tensor that does not require gradients.");
         }
