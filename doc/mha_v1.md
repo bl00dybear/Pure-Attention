@@ -1,3 +1,6 @@
+## Version 1 of MHA:
+
+```cpp
 //headers
 #include <layers/MultiheadAttention.h>
 #include <core/Tensor.h>
@@ -156,3 +159,5 @@ namespace layers {
         return result;
     }
 }
+
+```

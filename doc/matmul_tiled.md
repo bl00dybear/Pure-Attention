@@ -1,17 +1,12 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <cmath>
+## matmul_tiled.cu:
+
+```C
 #include <cuda_runtime.h>
 #include <core/Tensor.h>
 
-// #define TILE_WIDTH 16
-#define EPSILON 1e-3f  // Toleranță pentru compararea float-urilor
-
-
 #define TILE_WIDTH 16
 
-__global__ void matmul_kernel_tiled(const float* A, const float* B, float* C,int M, int N, int K) {
+__global__ void matmul_kernel_tiled(const float *A, const float *B, float *C, int M, int N, int K) {
     __shared__ float s_A[TILE_WIDTH][TILE_WIDTH];
     __shared__ float s_B[TILE_WIDTH][TILE_WIDTH];
 
@@ -47,16 +42,14 @@ __global__ void matmul_kernel_tiled(const float* A, const float* B, float* C,int
     
     // bx si by reprezinta indexii blocului curent, iar blocurile le am mapat
     // la tile urile in care spargem matricile mari
-    int bx = blockIdx.x;
-    int by = blockIdx.y;
     // tx si ty sunt coordonatele primite de thread ul curent, coordonate locale 
     // raportate la blocul curent
     int tx = threadIdx.x;
     int ty = threadIdx.y;
     // folosind adresele blocului si thread ului curent recalculam adresa globala 
     // pe care vom scrie rezultatul dupa inmultire
-    int global_row=by*TILE_WIDTH+ty;
-    int global_col=bx*TILE_WIDTH+tx;
+    int global_row = blockIdx.y * TILE_WIDTH + ty;
+    int global_col = blockIdx.x * TILE_WIDTH + tx;
 
     // 2048/16=128 tile uri
     // 2050/16=128 (ne trebuie 129) asa ca facem
@@ -65,19 +58,26 @@ __global__ void matmul_kernel_tiled(const float* A, const float* B, float* C,int
     int tile_num_reduction=(N+TILE_WIDTH-1)/TILE_WIDTH;
     float val = 0.0f;
 
-    for(int m=0;m<tile_num_reduction;m+=1){
-        int global_read_row_A=global_row, global_read_col_A=m*TILE_WIDTH+tx;
-        int global_read_row_B=m*TILE_WIDTH+ty, global_read_col_B=global_col;
-        
-        if(global_read_col_A<N and global_read_row_A<M)
-            s_A[ty][tx]=A[global_read_row_A*N+global_read_col_A];
-        else
-            s_A[ty][tx] = 0.0f;
+    for(int m = 0; m < tile_num_reduction; m += 1) {
+        int global_read_row_A = global_row;
+        int global_read_col_A = m * TILE_WIDTH + tx;
 
-        if(global_read_col_B<K and global_read_row_B<N)
-            s_B[ty][tx]=B[global_read_row_B*K+global_read_col_B];
-        else
+        int global_read_row_B = m * TILE_WIDTH + ty;
+        int global_read_col_B = global_col;
+        
+        if(global_read_col_A < N && global_read_row_A < M) {
+            s_A[ty][tx] = A[global_read_row_A * N + global_read_col_A];
+        }
+        else {
+            s_A[ty][tx] = 0.0f;
+        }
+
+        if(global_read_col_B < K && global_read_row_B < N) {
+            s_B[ty][tx] = B[global_read_row_B * K + global_read_col_B];
+        }
+        else {
             s_B[ty][tx] = 0.0f;
+        }
 
         __syncthreads();
 
@@ -88,10 +88,20 @@ __global__ void matmul_kernel_tiled(const float* A, const float* B, float* C,int
         __syncthreads();
     } 
 
-    if (global_row<M and global_col<K) {
-        C[global_row*K+global_col]=val;
+    if (global_row < M && global_col < K) {
+        C[global_row * K + global_col] = val;
     }
 }
+
+__global__ void addMatrixVector(const float *A, const float *X, float *B, const int M, const int N) {
+    int global_col = blockIdx.x * blockDim.x + threadIdx.x;
+    int global_row = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (global_row < M && global_col < N) {
+        int index = global_row * N + global_col;
+        B[index] = A[index] + X[global_col];
+    }
+} 
 
 void launch_matmul_tiled(core::Tensor& A, core::Tensor& B, core::Tensor& C,cudaStream_t stream) {
     int M = A.get_shape()[0];
@@ -124,7 +134,7 @@ void launch_matmul_tiled(core::Tensor& A, core::Tensor& B, core::Tensor& C,cudaS
     matmul_kernel_tiled<<<grid, block, 0, stream>>>(A.get_data_ptr(), B.get_data_ptr(), C.get_data_ptr(), M, N, K);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+void launch_addMatrixVector_tiled
 
 struct TestCase {
     int M, N, K;
@@ -268,3 +278,4 @@ int main() {
     
     return (failed == 0) ? 0 : 1;
 }
+```

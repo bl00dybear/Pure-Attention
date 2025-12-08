@@ -1,3 +1,6 @@
+## Cuda first steps:
+
+```C
 #include <iostream>
 #include <cuda_runtime.h>
 
@@ -78,3 +81,4 @@ int main() {
     cudaFree(d_A); cudaFree(d_X); cudaFree(d_B);
     delete A; delete X; delete B;
 }
+```

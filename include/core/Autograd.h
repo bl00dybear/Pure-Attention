@@ -3,6 +3,11 @@
 #include <core/Tensor.h>
 
 namespace core {
+    struct Function {
+        virtual void apply_backward() = 0;
+        virtual ~Function() = default;
+    };
+
     struct MatMulFunction : public Function {
         std::shared_ptr<Tensor> X_input;
         std::shared_ptr<Tensor> W_input;

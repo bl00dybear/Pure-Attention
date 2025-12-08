@@ -8,6 +8,7 @@
 namespace core {
     using float32_t = float;
 
+    // forward declaration
     struct Function;
 
     struct CudaDeallocator {
@@ -49,10 +50,5 @@ namespace core {
         void backward() const;
 
         friend struct Function;
-    };
-
-    struct Function {
-        virtual void apply_backward() = 0;
-        virtual ~Function() = default;
     };
 };

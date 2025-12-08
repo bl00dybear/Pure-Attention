@@ -1,5 +1,3 @@
-Sigur, hai să vizualizăm arhitectura **Linear -\> ReLU -\> Linear** sub formă de Graf Computațional (Autograd).
-
 Diferența majoră față de abordarea ta actuală (pe Layere) este că în Graf, operațiile sunt "atomice". Un strat `Linear` nu mai este o cutie neagră, ci este spart în operațiile sale matematice de bază: Înmulțire de Matrice (`MatMul`) și Adunare (`Add`).
 
 Iată schema logică a grafului. Citește-o de sus în jos pentru **Forward** și de jos în sus pentru **Backward**.

@@ -57,6 +57,7 @@ void launch_normal_population(
     float *A, 
     int M, 
     int N, 
+    float32_t std_dev,
     cudaStream_t stream = nullptr
 );
 
@@ -130,7 +131,8 @@ void launch_adam_step(
     float32_t beta2, 
     float32_t epsilon, 
     float32_t lr, 
-    int step, 
+    const float32_t beta1_corr,
+    const float32_t beta2_corr,
     cudaStream_t stream
 );
 

@@ -20,7 +20,7 @@ namespace core {
         const cudaStream_t& stream );
     void pop_grad_ones(Tensor *A,
         const cudaStream_t& stream );
-    void pop_data_normal(const std::shared_ptr<Tensor> &A,
+    void pop_data_normal(const std::shared_ptr<Tensor> &A, float std_dev, 
         const cudaStream_t& stream );
     std::shared_ptr<Tensor> mse_loss(const std::shared_ptr<Tensor>& preds, const std::shared_ptr<Tensor>& targets,
         const cudaStream_t& stream );

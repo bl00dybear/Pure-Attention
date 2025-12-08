@@ -14,7 +14,11 @@ namespace layers {
         bias = std::make_shared<core::Tensor>(std::vector<uint32_t>{1,out_channels},true);
 
         const cudaStream_t& stream = CudaContext::getStream();
-        pop_data_normal(weight,stream);
+        
+        // Xavier Initialization: 1 / sqrt(in_features)
+        float std_dev = 1.0f / std::sqrt(static_cast<float>(in_channels));
+        
+        pop_data_normal(weight, std_dev, stream); // Pasăm std_dev calculat
         pop_data_zeros(bias,stream);
     }
 

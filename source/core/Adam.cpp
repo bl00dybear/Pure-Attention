@@ -31,6 +31,10 @@ namespace optim {
     void Adam::step() {
         step_count++;
 
+        // Calculăm factorii de corecție pe CPU (mult mai rapid și corect)
+        float bias_correction1 = 1.0f - std::pow(beta1, step_count);
+        float bias_correction2 = 1.0f - std::pow(beta2, step_count);
+
         for (size_t i = 0; i < parameters.size(); ++i) {
             auto& param = parameters[i];
             
@@ -53,7 +57,8 @@ namespace optim {
                 beta2,
                 epsilon,
                 lr,
-                step_count,
+                bias_correction1,
+                bias_correction2,
                 CudaContext::getStream()
             );
         }

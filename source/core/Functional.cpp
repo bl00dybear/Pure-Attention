@@ -138,7 +138,7 @@ namespace core {
         launch_ones_population(A->get_gradient_ptr(), M, N, stream);
     }
 
-    void pop_data_normal(const std::shared_ptr<Tensor>& A,
+    void pop_data_normal(const std::shared_ptr<Tensor>& A, float std_dev,
         const cudaStream_t& stream = CudaContext::getStream()){
         int M = A->get_shape()[0];
         int N = A->get_shape()[1];
@@ -147,7 +147,7 @@ namespace core {
             N = 1;
 
 
-        launch_normal_population(A->get_data_ptr(), M, N, stream);
+        launch_normal_population(A->get_data_ptr(), M, N, std_dev, stream);
     }
 
 
@@ -175,11 +175,6 @@ namespace core {
 
         return loss;
     }
-
-
-
-
-
 
     std::shared_ptr<Tensor> flash_attention(
         const std::shared_ptr<Tensor>& Q,

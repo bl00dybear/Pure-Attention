@@ -2,6 +2,7 @@
 #include <core/Tensor.h>
 #include <core/Context.h>
 #include <core/Functional.h>
+#include <core/Autograd.h>
 
 // libs
 #include <cuda_runtime.h>

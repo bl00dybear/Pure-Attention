@@ -36,6 +36,7 @@ __global__ void populate_normal(
     float32_t *A, 
     uint32_t M, 
     uint32_t N, 
+    float32_t std_dev,
     const uint64_t seed
 );
 
@@ -107,8 +108,8 @@ __global__ void adam_step_kernel(
     const float32_t beta2,
     const float32_t epsilon,
     const float32_t alpha,
-    const float32_t beta1_step,
-    const float32_t beta2_step
+    const float32_t beta1_corr,
+    const float32_t beta2_corr
 );
 
 

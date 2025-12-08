@@ -1,0 +1,16 @@
+// headers
+#include <backend/Kernels.cuh>
+
+__global__ void populate_normal(float32_t *A, uint32_t M, uint32_t N, float32_t std_dev, const uint64_t seed) {
+    const uint32_t tid0 = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint32_t stride = gridDim.x * blockDim.x;
+    const uint32_t total = M * N;
+
+    curandStatePhilox4_32_10_t state;
+    curand_init(seed, tid0, 0, &state);
+
+    for (uint32_t i = tid0; i < total; i += stride) {
+        // Înmulțim cu std_dev pentru a scala distribuția
+        A[i] = curand_normal(&state) * std_dev; 
+    }
+}

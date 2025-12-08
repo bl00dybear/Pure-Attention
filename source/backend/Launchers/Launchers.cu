@@ -32,7 +32,7 @@ void launch_ones_population(float32_t *A, int M, int N, cudaStream_t stream){
     cudaStreamSynchronize(stream);
 }
 
-void launch_normal_population(float32_t *A, int M, int N, cudaStream_t stream){
+void launch_normal_population(float32_t *A, int M, int N, float32_t std_dev, cudaStream_t stream) {
     size_t total = static_cast<size_t>(M) * static_cast<size_t>(N);
 
     int device;
@@ -59,7 +59,7 @@ void launch_normal_population(float32_t *A, int M, int N, cudaStream_t stream){
     );
 
     // seed=42;
-    populate_normal<<<blocks, threads, 0, stream>>>(A, M, N, seed);
+    populate_normal<<<blocks, threads, 0, stream>>>(A, M, N, std_dev, seed);
 }
 
 void launch_ReLU_tiled(float32_t *In, float32_t *Out, int M, int N, cudaStream_t stream) {
@@ -157,15 +157,12 @@ void launch_adam_step(
     float32_t beta2,
     float32_t epsilon,
     float32_t lr,
-    int step,
+    const float32_t beta1_corr,
+    const float32_t beta2_corr,
     cudaStream_t stream
 ) {
     int threads = 256;
     int blocks = (size + threads - 1) / threads;
-
-    // Calculăm corecțiile pe CPU ca să nu facem powf pe GPU în fiecare thread
-    float32_t beta1_corr = 1.0f - std::pow(beta1, static_cast<float32_t>(step));
-    float32_t beta2_corr = 1.0f - std::pow(beta2, static_cast<float32_t>(step));
 
     adam_step_kernel<<<blocks, threads, 0, stream>>>(
         params, grads, m, v, size, beta1, beta2, epsilon, lr, beta1_corr, beta2_corr

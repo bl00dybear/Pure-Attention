@@ -7,6 +7,7 @@
 // libs
 #include <memory>
 #include <vector>
+#include <cmath>
 
 namespace layers {
     class Linear : public Module {
