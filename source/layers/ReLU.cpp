@@ -7,8 +7,4 @@ namespace layers {
         const cudaStream_t& stream = CudaContext::getStream();
         return relu(In,stream);
     };
-
-    std::vector<std::shared_ptr<core::Tensor>> ReLU::parameters() {
-        return {};
-    }
 };

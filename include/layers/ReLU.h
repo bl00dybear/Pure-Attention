@@ -11,6 +11,5 @@ namespace layers {
         ReLU() = default;
 
         std::shared_ptr<core::Tensor> forward(const std::shared_ptr<core::Tensor> &In) override;
-        std::vector<std::shared_ptr<core::Tensor>> parameters() override;
     };
 };

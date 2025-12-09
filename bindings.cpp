@@ -5,7 +5,7 @@
 #include <layers/Module.h>
 #include <layers/Linear.h>
 #include <layers/ReLU.h>
-#include <layers/MSELoss.h>
+#include <loss/MSE.h>
 #include <core/Functional.h>
 #include <core/Adam.h>
 
@@ -64,10 +64,10 @@ PYBIND11_MODULE(PureAttention, m) {
         .def("forward", &ReLU::forward)
         .def("parameters", &ReLU::parameters);
 
-    py::class_<MSELoss, Module, std::shared_ptr<MSELoss>>(m, "MSELoss")
+    py::class_<loss::MSE, std::shared_ptr<loss::MSE>>(m, "MSE")
         .def(py::init<>())
-        .def("forward", py::overload_cast<const std::shared_ptr<Tensor>&, const std::shared_ptr<Tensor>&>(&MSELoss::forward))
-        .def("__call__", py::overload_cast<const std::shared_ptr<Tensor>&, const std::shared_ptr<Tensor>&>(&MSELoss::forward));
+        .def("forward", py::overload_cast<const std::shared_ptr<Tensor>&, const std::shared_ptr<Tensor>&>(&loss::MSE::forward))
+        .def("__call__", py::overload_cast<const std::shared_ptr<Tensor>&, const std::shared_ptr<Tensor>&>(&loss::MSE::forward));
 
     py::class_<optim::Adam, std::shared_ptr<optim::Adam>>(m, "Adam")
         .def(py::init<std::vector<std::shared_ptr<Tensor>>, float, float, float, float>(), 

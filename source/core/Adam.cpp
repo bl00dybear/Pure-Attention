@@ -8,13 +8,10 @@
 #include <cmath>
 
 namespace optim {
-
     Adam::Adam(std::vector<std::shared_ptr<core::Tensor>> params, float lr, float beta1, float beta2, float eps)
         : parameters(params), lr(lr), beta1(beta1), beta2(beta2), epsilon(eps), step_count(0) 
     {
-        // Initializam m si v cu 0 pentru fiecare parametru
         for (const auto& p : parameters) {
-            // Creăm tensori de aceeași formă, fără gradienți
             auto m = std::make_shared<core::Tensor>(p->get_shape(), false, false);
             auto v = std::make_shared<core::Tensor>(p->get_shape(), false, false);
 
@@ -31,14 +28,12 @@ namespace optim {
     void Adam::step() {
         step_count++;
 
-        // Calculăm factorii de corecție pe CPU (mult mai rapid și corect)
         float bias_correction1 = 1.0f - std::pow(beta1, step_count);
         float bias_correction2 = 1.0f - std::pow(beta2, step_count);
 
         for (size_t i = 0; i < parameters.size(); ++i) {
             auto& param = parameters[i];
             
-            // Dacă parametrul nu are gradient calculat, sărim peste el
             if (!param->requires_grad() || param->get_gradient_ptr() == nullptr) {
                 continue;
             }
@@ -46,7 +41,6 @@ namespace optim {
             uint32_t size = 1;
             for(auto s : param->get_shape()) size *= s;
 
-            // Lansăm kernel-ul CUDA definit anterior
             launch_adam_step(
                 param->get_data_ptr(),
                 param->get_gradient_ptr(),

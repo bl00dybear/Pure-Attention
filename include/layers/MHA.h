@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace layers {
-    class MultiheadAttention : public Module {
+    class MHA : public Module {
     private:
         uint32_t model_dimension;
         uint32_t heads_number;
@@ -31,7 +31,7 @@ namespace layers {
 
 
     public:
-        MultiheadAttention(const uint32_t model_dimension, const uint32_t heads_number);
+        MHA(const uint32_t model_dimension, const uint32_t heads_number);
 
         std::shared_ptr<core::Tensor> forward(const std::shared_ptr<core::Tensor> &input) override;
         std::shared_ptr<core::Tensor> forward (

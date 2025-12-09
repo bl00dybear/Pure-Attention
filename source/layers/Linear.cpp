@@ -15,10 +15,10 @@ namespace layers {
 
         const cudaStream_t& stream = CudaContext::getStream();
         
-        // Xavier Initialization: 1 / sqrt(in_features)
+        // Xavier Initialization
         float std_dev = 1.0f / std::sqrt(static_cast<float>(in_channels));
         
-        pop_data_normal(weight, std_dev, stream); // Pasăm std_dev calculat
+        pop_data_normal(weight, std_dev, stream);
         pop_data_zeros(bias,stream);
     }
 

@@ -62,7 +62,6 @@ namespace core {
         uint32_t N = In->get_shape()[1];
 
         bool needs_grad = In->requires_grad();
-        // printf("ReLU needs grad: %d\n", needs_grad);
 
         auto Out = std::make_shared<Tensor>(std::vector<uint32_t>{M, N},needs_grad,false);
 

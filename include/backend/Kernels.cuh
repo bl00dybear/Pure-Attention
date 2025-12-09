@@ -41,9 +41,9 @@ __global__ void populate_normal(
 );
 
 __global__ void matmul_backward_X_kernel(
-    const float32_t* __restrict__ grad_Y_out,
-    const float32_t* __restrict__ W_in,
-    float32_t* __restrict__ grad_X_in,
+    const float32_t* grad_Y_out,
+    const float32_t* W_in,
+    float32_t* grad_X_in,
     const uint32_t M, 
     const uint32_t N, 
     const uint32_t K
@@ -115,10 +115,10 @@ __global__ void adam_step_kernel(
 
 template <int Br, int Bc, int D>
 __global__ void flash_attention_kernel(
-    const float* __restrict__ Q,
-    const float* __restrict__ K,
-    const float* __restrict__ V,
-    float* __restrict__ O,
+    const float* Q,
+    const float* K,
+    const float* V,
+    float* O,
     const int N,
     const int H,
     const int L,
@@ -130,24 +130,24 @@ __global__ void flash_attention_kernel(
 
 
 __global__ void compute_delta_kernel(
-    const float* __restrict__ dO,
-    const float* __restrict__ O,
-    float* __restrict__ Delta,
+    const float* dO,
+    const float* O,
+    float* Delta,
     const int N, const int H, const int L, const int D
 );
 
 template <int Br, int Bc, int D>
 __global__ void __launch_bounds__(128) flash_attn_backward_kernel(
-    const float* __restrict__ Q,
-    const float* __restrict__ K,
-    const float* __restrict__ V,
-    const float* __restrict__ O,
-    const float* __restrict__ dO,
-    const float* __restrict__ L_vec,
-    const float* __restrict__ Delta,
-    float* __restrict__ dQ,
-    float* __restrict__ dK,
-    float* __restrict__ dV,
+    const float* Q,
+    const float* K,
+    const float* V,
+    const float* O,
+    const float* dO,
+    const float* L_vec,
+    const float* Delta,
+    float* dQ,
+    float* dK,
+    float* dV,
     const int stride_batch,
     const int stride_head,
     const int stride_seq,

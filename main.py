@@ -70,7 +70,7 @@ def main():
     
     # Learning rate poate necesita ajustare. 0.001 sau 0.01 sunt standard.
     optimizer = pa.Adam(model.parameters(), lr=0.0001) 
-    criterion = pa.MSELoss()
+    criterion = pa.MSE()
 
     print(f"Start training on {B} samples...")
 
@@ -92,7 +92,7 @@ def main():
         optimizer.step()
 
         if i % 50 == 0:
-            # Loss-ul returnat de MSELoss ar trebui să scadă
+            # Loss-ul returnat de MSE ar trebui să scadă
             val_loss = loss.to_host()[0]
             print(f"Epoch {i}, MSE Loss: {val_loss:.6f}")
 

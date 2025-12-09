@@ -1,5 +1,5 @@
 //headers
-#include <layers/MultiheadAttention.h>
+#include <layers/MHA.h>
 #include <core/Tensor.h>
 #include <core/Functional.h>
 
@@ -7,16 +7,16 @@
 #include <thread>
 
 namespace layers {
-    MultiheadAttention::MultiheadAttention(const uint32_t model_dimension, const uint32_t heads_number):
+    MHA::MHA(const uint32_t model_dimension, const uint32_t heads_number):
     model_dimension(model_dimension), heads_number(heads_number) {}
 
-    std::shared_ptr<core::Tensor> MultiheadAttention::forward(const std::shared_ptr<core::Tensor> &input) {
-        throw std::runtime_error("MultiheadAttention cannot be called with 1 argument. Use (query, key, value, mask).");
+    std::shared_ptr<core::Tensor> MHA::forward(const std::shared_ptr<core::Tensor> &input) {
+        throw std::runtime_error("MHA cannot be called with 1 argument. Use (query, key, value, mask).");
     }
 
 
 
-    std::shared_ptr<core::Tensor> MultiheadAttention::forward (
+    std::shared_ptr<core::Tensor> MHA::forward (
         const std::shared_ptr<core::Tensor> &query,     // N x L x E
         const std::shared_ptr<core::Tensor> &key,       // N x L x E
         const std::shared_ptr<core::Tensor> &value,     // N x L x E
@@ -39,10 +39,10 @@ namespace layers {
             if (valid_N_dim && valid_L_dim && valid_E_dim) {
                 N = q_input_shape[0], L = q_input_shape[1], E = q_input_shape[2];
             }else{
-                throw std::runtime_error("MultiheadAttention shapes are not valid.");
+                throw std::runtime_error("MHA shapes are not valid.");
             }
         } else {
-            throw std::runtime_error("MultiheadAttention shapes are not valid.");
+            throw std::runtime_error("MHA shapes are not valid.");
         }
 
 
@@ -51,7 +51,7 @@ namespace layers {
         return nullptr;
     }
 
-    std::vector<std::shared_ptr<core::Tensor>> MultiheadAttention::parameters() {
+    std::vector<std::shared_ptr<core::Tensor>> MHA::parameters() {
         std::vector<std::shared_ptr<core::Tensor>> result;
 
         return result;
