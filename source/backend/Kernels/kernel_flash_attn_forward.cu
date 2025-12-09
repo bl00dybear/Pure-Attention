@@ -17,10 +17,11 @@ __device__ __forceinline__ void store_float4(float* ptr, int idx, float4 val) {
 
 template <int B_r, int B_c, int D>
 __global__ void flash_attention_kernel(
-    const float* __restrict__ Q,    // N x L x E
-    const float* __restrict__ K,    // N x L x E
-    const float* __restrict__ V,    // N x L x E
+    const float* __restrict__ Q,
+    const float* __restrict__ K,
+    const float* __restrict__ V,
     float* __restrict__ O,
+    float* __restrict__ L_cache,
     const int N,
     const int H,
     const int L,
@@ -33,10 +34,10 @@ __global__ void flash_attention_kernel(
 
     const int tx = threadIdx.x;
     const int ty = threadIdx.y;
-
     const int bx = blockIdx.x;
     const int by = blockIdx.y;
 
+    // 3: for 1 <= i <= Tr do
     const int q_block_idx = by;
     const int kv_block_count = (L + B_c - 1) / B_c;
 
@@ -52,13 +53,14 @@ __global__ void flash_attention_kernel(
     float* sramK = sram + B_r * D;
     float* sramV = sram + B_r * D + B_c * D;
 
+    // 5: On chip, initialize O_i = (0), l_i = (0), m_i = (-inf).
     float acc[D] = {0.0f};
     float l = 0.0f;
     float m = -CUDART_INF_F;
 
     int q_global_offset = q_offset_base + (q_block_idx * B_r * stride_seq);
 
-    //
+    // 4: Load Q_i from HBM to on-chip SRAM.
     #pragma unroll
     for (int i = ty; i < B_r; i += blockDim.y) {
         if (q_block_idx * B_r + i < L) {
@@ -77,10 +79,12 @@ __global__ void flash_attention_kernel(
 
     __syncthreads();
 
+    // 6: for 1 <= j <= Tc do
     for (int j = 0; j < kv_block_count; ++j) {
         int k_global_offset = k_offset_base + (j * B_c * stride_seq);
         int v_global_offset = v_offset_base + (j * B_c * stride_seq);
 
+        // 7: Load K_j, V_j from HBM to on-chip SRAM.
         #pragma unroll
         for (int i = ty; i < B_c; i += blockDim.y) {
             if (j * B_c + i < L) {
@@ -112,6 +116,7 @@ __global__ void flash_attention_kernel(
 
             float scores[B_c];
 
+            // 8: On chip, compute S_ij = Q_i * K_j^T
             #pragma unroll
             for (int k = 0; k < B_c; ++k) {
                 float score = 0.0f;
@@ -124,6 +129,7 @@ __global__ void flash_attention_kernel(
                 if (j * B_c + k >= L) score = -CUDART_INF_F;
 
                 scores[k] = score;
+                // 9: On chip, compute m_ij = max(m_i, rowmax(S_ij))
                 row_m_curr = fmaxf(row_m_curr, score);
             }
 
@@ -133,6 +139,8 @@ __global__ void flash_attention_kernel(
             float exp_diff_curr = __expf(row_m_curr - new_m);
 
             float row_sum_exp = 0.0f;
+
+            // 9: On chip, compute P_ij = exp(S_ij - m_ij) (pointwise)
             #pragma unroll
             for (int k = 0; k < B_c; ++k) {
                 float p = __expf(scores[k] - new_m);
@@ -140,8 +148,10 @@ __global__ void flash_attention_kernel(
                 row_sum_exp += p;
             }
 
+            // 9: On chip, compute l_ij = e^(m_prev - m_new) * l_prev + rowsum(P_ij)
             float new_l = (row_l_prev * exp_diff_prev) + row_sum_exp;
 
+            // 10: On chip, compute O_i = diag(e^(m_prev - m_new)) * O_i + P_ij * V_j
             #pragma unroll
             for (int x = 0; x < D; ++x) {
                 float pv_sum = 0.0f;
@@ -156,16 +166,23 @@ __global__ void flash_attention_kernel(
             m = new_m;
         }
         __syncthreads();
-    }
+    } // 11: end for
 
     if (const int row = ty; row < B_r && (q_block_idx * B_r + row) < L) {
+        // 12: On chip, compute O_i = diag(l_i)^-1 * O_i
         float inv_l = 1.0f / (l + 1e-6f);
         const int out_idx = o_offset_base + (q_block_idx * B_r + row) * stride_seq;
 
+        // 14: Write O_i to HBM as the i-th block of O.
         #pragma unroll
         for (int x = 0; x < D; ++x) {
             O[out_idx + x] = acc[x] * inv_l;
         }
+
+        // 13: On chip, compute L_i = m_i + log(l_i).
+        // 15: Write L_i to HBM as the i-th block of L.
+        int l_idx = (batch_idx * H + head_idx) * L + (q_block_idx * B_r + row);
+        L_cache[l_idx] = m + __logf(l);
     }
 }
 
