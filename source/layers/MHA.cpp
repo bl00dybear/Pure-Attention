@@ -31,7 +31,7 @@ namespace layers {
         matadd(XW, bias, proj_output, stream);
         
         std::vector<std::shared_ptr<core::Tensor>> qkv;
-        // split(proj_output, 3, -1, qkv, stream);
+        split(proj_output, 3, -1, qkv, stream);
 
         std::shared_ptr<core::Tensor> Q_reshaped, K_reshaped, V_reshaped;
         std::vector<uint32_t> input_shape = input->get_shape();
@@ -43,9 +43,9 @@ namespace layers {
             head_dim           
         };
 
-        // reshape(qkv[0], flash_shape, Q_reshaped, stream);
-        // reshape(qkv[1], flash_shape, K_reshaped, stream);
-        // reshape(qkv[2], flash_shape, V_reshaped, stream);
+        reshape(qkv[0], flash_shape, Q_reshaped, stream);
+        reshape(qkv[1], flash_shape, K_reshaped, stream);
+        reshape(qkv[2], flash_shape, V_reshaped, stream);
 
         std::shared_ptr<core::Tensor> attn_output;
         // flash_attention(Q_reshaped, K_reshaped, V_reshaped, attn_output, stream);
@@ -61,8 +61,8 @@ namespace layers {
         uint32_t head_dim = embed_dim / num_heads;
         
         std::vector<std::shared_ptr<core::Tensor>> w_parts, b_parts;
-        // split(weight, 3, 1, w_parts, stream);
-        // split(bias, 3, 1, b_parts, stream);
+        split(weight, 3, 1, w_parts, stream);
+        split(bias, 3, 1, b_parts, stream);
 
         std::shared_ptr<core::Tensor> tmp_q, tmp_k, tmp_v;
         std::shared_ptr<core::Tensor> Q_proj, K_proj, V_proj;
@@ -84,9 +84,9 @@ namespace layers {
         std::vector<uint32_t> shape_q = {q_shape[0], q_shape[1], num_heads, head_dim};
         std::vector<uint32_t> shape_kv = {k_shape[0], k_shape[1], num_heads, head_dim};
 
-        // reshape(Q_proj, shape_q, Q_reshaped, stream);
-        // reshape(K_proj, shape_kv, K_reshaped, stream);
-        // reshape(V_proj, shape_kv, V_reshaped, stream);
+        reshape(Q_proj, shape_q, Q_reshaped, stream);
+        reshape(K_proj, shape_kv, K_reshaped, stream);
+        reshape(V_proj, shape_kv, V_reshaped, stream);
 
         std::shared_ptr<core::Tensor> attn_output;
         // flash_attention(Q_reshaped, K_reshaped, V_reshaped, attn_output, stream);

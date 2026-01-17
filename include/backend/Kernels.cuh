@@ -154,3 +154,21 @@ __global__ void __launch_bounds__(256) flash_attn_backward_kernel(
     const int L,
     const float sm_scale
 );
+
+__global__ void split_last_dim_kernel(
+    const float32_t* input,
+    float32_t** outputs,
+    uint32_t num_splits,
+    uint32_t inner_size,
+    uint32_t split_size,
+    uint32_t total_elements
+);
+
+__global__ void concat_last_dim_kernel(
+    float32_t** inputs,
+    float32_t* output,
+    uint32_t num_splits,
+    uint32_t inner_size,
+    uint32_t split_size,
+    uint32_t total_elements
+);
