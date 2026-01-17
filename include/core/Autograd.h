@@ -48,4 +48,22 @@ namespace core {
 
         void apply_backward() override;
     };
+
+    struct SplitFunction : public Function {
+        std::weak_ptr<Tensor> Input;
+        std::vector<std::shared_ptr<Tensor>> Outputs;
+
+        SplitFunction(std::shared_ptr<Tensor> in, std::vector<std::shared_ptr<Tensor>> outs);
+
+        void apply_backward() override;
+    };
+
+    struct ReshapeFunction : public Function {
+        std::shared_ptr<Tensor> Input;
+        std::weak_ptr<Tensor> Output;
+        std::vector<uint32_t> original_shape;
+
+        ReshapeFunction(std::shared_ptr<Tensor> in, std::shared_ptr<Tensor> out);
+        void apply_backward() override;
+    };
 };

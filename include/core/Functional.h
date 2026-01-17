@@ -49,4 +49,17 @@ namespace core {
         const std::shared_ptr<Tensor>& preds, 
         const std::shared_ptr<Tensor>& targets,
         const cudaStream_t& stream);
+
+    void split(
+        const std::shared_ptr<Tensor>& A,
+        uint32_t num_parts,
+        int dim,
+        std::vector<std::shared_ptr<Tensor>>& parts,
+        const cudaStream_t& stream);
+
+    void reshape(
+        const std::shared_ptr<Tensor>& input,
+        const std::vector<uint32_t>& new_shape,
+        std::shared_ptr<Tensor>& output,
+        const cudaStream_t& stream);
 };

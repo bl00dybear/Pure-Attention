@@ -135,3 +135,23 @@ void launch_adam_step(
     const float32_t beta2_corr,
     cudaStream_t stream
 );
+
+void launch_split_forward(
+    const float32_t* input, 
+    std::vector<float32_t*>& output_list, 
+    uint32_t num_splits,
+    uint32_t inner_size,
+    uint32_t split_size,
+    uint32_t total_elements,
+    cudaStream_t stream
+);
+
+void launch_concat_backward(
+    std::vector<float32_t*>& input_grads,
+    float32_t* output_grad,
+    uint32_t num_splits,
+    uint32_t inner_size,
+    uint32_t split_size,
+    uint32_t total_elements,
+    cudaStream_t stream
+);

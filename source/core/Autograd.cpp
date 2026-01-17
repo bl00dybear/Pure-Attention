@@ -102,4 +102,65 @@ namespace core {
         }
     }
 
+
+    SplitFunction::SplitFunction(std::shared_ptr<Tensor> in, std::vector<std::shared_ptr<Tensor>> outs)
+        : Input(in), Outputs(outs) {}
+
+    void SplitFunction::apply_backward() {
+        auto input_ptr = Input.lock();
+        if (!input_ptr) return;
+
+        if (input_ptr->requires_grad()) {
+            std::vector<float*> grad_ptrs;
+            
+            for (auto& out : Outputs) {
+                grad_ptrs.push_back(out->get_gradient_ptr());
+            }
+
+            uint32_t dim = input_ptr->get_shape().size() - 1;
+            uint32_t num_splits = Outputs.size();
+            uint32_t inner_size = input_ptr->get_shape()[dim];
+            uint32_t split_size = inner_size / num_splits;
+            
+            uint32_t total_elements = 1;
+            for(auto s : input_ptr->get_shape()) total_elements *= s;
+
+            launch_concat_backward(
+                grad_ptrs,
+                input_ptr->get_gradient_ptr(),
+                num_splits,
+                inner_size,
+                split_size,
+                total_elements,
+                CudaContext::getStream()
+            );
+
+            input_ptr->backward(false);
+        }
+    }
+
+
+    ReshapeFunction::ReshapeFunction(std::shared_ptr<Tensor> in, std::shared_ptr<Tensor> out)
+        : Input(in), Output(out) {
+        original_shape = in->get_shape();
+    }
+
+    void ReshapeFunction::apply_backward() {
+        auto out_ptr = Output.lock();
+        if (!out_ptr) return;
+
+        if (Input->requires_grad()) {
+            uint32_t size = 1;
+            for (auto s : out_ptr->get_shape()) size *= s;
+
+            launch_tensor_add_grad(
+                out_ptr->get_gradient_ptr(),
+                Input->get_gradient_ptr(),
+                size,
+                CudaContext::getStream()
+            );
+
+            Input->backward(false);
+        }
+    }
 }
